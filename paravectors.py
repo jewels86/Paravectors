@@ -42,20 +42,38 @@ class Chain:
         return hs[-1]
 
     def as_function(self, h: float, k: float, x_compliant: bool = True):
-        hs: dict[int, float] = {-2: 0, -1: h}
-        ks: dict[int, float] = {-2: 0, -1: k}
-        funcs = {-1: lambda _: 0}
-        for i in range(len(self.paravectors)):
-            theta = self.paravectors[i].theta
-            if x_compliant: funcs[i] = self.paravectors[i].as_global_x(h, k)
-            else: funcs[i] = self.paravectors[i].as_global_y(h, k)
-            hs[i] = hs[i-2] + self.paravectors[i-1].alpha * np.cos(self.paravectors[i-1].theta)
-            ks[i] = ks[i-1] + funcs[i-1](hs[i]) - hs[i] * np.tan(theta)
+        # Track the end point of each segment
+        segment_starts_x = [h]
+        segment_starts_y = [k]
+        funcs = []
+
+        for i, pv in enumerate(self.paravectors):
+            # Get the local function for this paravector
+            if x_compliant:
+                local_func = pv.as_global_x(0, 0)  # Start at origin in local coords
+            else:
+                local_func = pv.as_global_y(0, 0)
+
+            funcs.append(local_func)
+
+            # Calculate where this segment ends
+            next_x = segment_starts_x[-1] + pv.alpha * np.cos(pv.theta)
+            next_y = segment_starts_y[-1] + local_func(pv.alpha * np.cos(pv.theta))
+
+            segment_starts_x.append(next_x)
+            segment_starts_y.append(next_y)
 
         def func(x):
-            for i in range(len(self.paravectors)):
-                if hs[i-1] <= x <= hs[i]:
-                    return funcs[i](x) + ks[i]
+            for j in range(len(self.paravectors)):
+                x_start = segment_starts_x[j]
+                x_end = segment_starts_x[j + 1]
+
+                if x_start <= x <= x_end:
+                    # Transform x to local coordinates
+                    local_x = x - x_start
+                    local_y = funcs[j](local_x)
+                    return segment_starts_y[j] + local_y
+
             return None
 
         return func
@@ -138,7 +156,7 @@ def simple_paravector(show = True): return paravector_example(1, np.pi / 4, np.p
 
 def sin_like_chain(show = True):
     upsilon_1 = Paravector(1, np.pi / 4, np.pi / 4)
-    upsilon_2 = Paravector(1, -np.pi / 4, -np.pi / 4)
+    upsilon_2 = Paravector(1, -np.pi / 4, np.pi / 4)
     upsilon_3 = Paravector(1, -np.pi / 4, np.pi / 4)
     upsilon_4 = Paravector(1, np.pi / 4, np.pi / 4)
     chain = Chain([upsilon_1, upsilon_2, upsilon_3, upsilon_4])
