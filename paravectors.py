@@ -19,7 +19,33 @@ class Paravector:
         return lambda x: a * (x - h) * (x - h - self.alpha) + k
 
     def as_global_x(self, h, k):
-        return lambda x: x * np.tan(self.theta) + self.as_local_x(h, k)(x / np.cos(self.theta))
+        a = np.tan(-self.beta) / self.alpha
+
+        def func(x):
+            # Handle the case where theta ≈ 0 (no rotation)
+            if np.abs(np.sin(self.theta)) < epsilon:
+                local_x = x - h
+                local_y = a * local_x * (local_x - self.alpha)
+                return k + local_y
+
+            # Quadratic coefficients for rotated case
+            A = a * np.sin(self.theta)
+            B = -(np.cos(self.theta) + a * self.alpha * np.sin(self.theta))
+            C = x - h
+
+            discriminant = B ** 2 - 4 * A * C
+            if discriminant < 0:
+                return None
+
+            # Take the appropriate root (probably the smaller one for forward direction)
+            local_x = (-B - np.sqrt(discriminant)) / (2 * A)
+
+            local_y = a * local_x * (local_x - self.alpha)
+            y = k + local_x * np.sin(self.theta) + local_y * np.cos(self.theta)
+
+            return y
+
+        return func
 
     def as_local_y(self, h, k):
         a = np.tan(-self.beta - (np.pi / 2)) / self.alpha
@@ -193,4 +219,4 @@ def sin_like_chain(show = True):
 #endregion
 
 if __name__ == "__main__":
-    plot(simple_paravector(False))
+    sin_like_chain()
