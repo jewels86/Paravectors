@@ -14,21 +14,19 @@ class Paravector:
         self.theta = theta
         self.beta = beta
 
-    def as_local_x(self, h, k):
+    def as_local_x(self):
         a = np.tan(-self.beta) / self.alpha
-        return lambda x: a * (x - h) * (x - h - self.alpha) + k
+        return lambda x: a * x * (x - self.alpha)
 
     def as_global_x(self, h, k):
         a = np.tan(-self.beta) / self.alpha
 
         def func(x):
-            # Handle the case where theta ≈ 0 (no rotation)
-            if np.abs(np.sin(self.theta)) < epsilon:
+            if np.abs(np.sin(self.theta)) < epsilon: # no rotation
                 local_x = x - h
                 local_y = a * local_x * (local_x - self.alpha)
                 return k + local_y
 
-            # Quadratic coefficients for rotated case
             A = a * np.sin(self.theta)
             B = -(np.cos(self.theta) + a * self.alpha * np.sin(self.theta))
             C = x - h
@@ -205,7 +203,7 @@ def vector_example(span, theta, show = True):
     if show: plot(upsilon)
     return upsilon
 
-def simple_paravector(show = True): return paravector_example(1, np.pi / 4, np.pi / 4 - 0.1, show)
+def simple_paravector(show = True): return paravector_example(4, np.pi / 4, np.pi / 4 - 0.1, show)
 
 def sin_like_chain(show = True):
     upsilon_1 = Paravector(1, np.pi / 4, np.pi / 4)
@@ -219,4 +217,4 @@ def sin_like_chain(show = True):
 #endregion
 
 if __name__ == "__main__":
-    sin_like_chain()
+    simple_paravector()
