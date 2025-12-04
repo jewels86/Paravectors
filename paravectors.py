@@ -34,8 +34,6 @@ class Paravector:
             discriminant = B ** 2 - 4 * A * C
             if discriminant < 0:
                 return None
-
-            # Take the appropriate root (probably the smaller one for forward direction)
             local_x = (-B - np.sqrt(discriminant)) / (2 * A)
 
             local_y = a * local_x * (local_x - self.alpha)
@@ -79,7 +77,7 @@ class Chain:
             funcs.append(local_func)
 
             next_x = segment_starts_x[-1] + pv.alpha * np.cos(pv.theta)
-            next_y = segment_starts_y[-1] + local_func(pv.alpha * np.cos(pv.theta))
+            next_y = segment_starts_y[-1] + pv.alpha * np.sin(pv.theta)
 
             segment_starts_x.append(next_x)
             segment_starts_y.append(next_y)
@@ -104,22 +102,20 @@ class Chain:
 def plot_local(upsilon: Paravector, path: str = None):
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    x_start = 0
     x_end = upsilon.alpha
-    y_start = 0
     y_end = 0
-    func = upsilon.as_local_x(x_start, y_start)
+    func = upsilon.as_local_x()
 
-    x_values = np.linspace(x_start, x_end, 100)
+    x_values = np.linspace(0, x_end, 100)
     y_values = [func(x) for x in x_values]
 
     ax.plot(x_values, y_values, label='upsilon')
 
     beta_x_end = np.cos(upsilon.beta)
     beta_y_end = np.sin(upsilon.beta)
-    ax.axline((x_start, y_start), (beta_x_end, beta_y_end), color='red', label='beta')
+    ax.axline((0, 0), (beta_x_end, beta_y_end), color='red', label='beta')
 
-    ax.axline((x_start, y_start), (x_end, y_end), color='green', label='span')
+    ax.axline((0, 0), (x_end, y_end), color='green', label='span')
 
     ax.set_xlabel('x')
     ax.set_ylabel('y')
@@ -199,22 +195,33 @@ def paravector_example(span, theta, beta, show = True):
     return upsilon
 
 def vector_example(span, theta, show = True):
-    upsilon = Paravector(span, theta, 0)
+    upsilon = Paravector(span, theta, epsilon)
     if show: plot(upsilon)
     return upsilon
 
 def simple_paravector(show = True): return paravector_example(4, np.pi / 4, np.pi / 4 - 0.1, show)
 
-def sin_like_chain(show = True):
-    upsilon_1 = Paravector(1, np.pi / 4, np.pi / 4)
-    upsilon_2 = Paravector(1, -np.pi / 4, np.pi / 4)
-    upsilon_3 = Paravector(1, -np.pi / 4, -np.pi / 4)
-    upsilon_4 = Paravector(1, np.pi / 4, -np.pi / 4)
+def sin_like_chain1(show = True):
+    pi_over_4 = np.pi / 4
+    pi_over_2 = np.pi / 2
+
+    upsilon_1 = Paravector(1, pi_over_4, epsilon)
+    upsilon_2 = Paravector(pi_over_2, 0, (np.pi / 4) - epsilon)
+    upsilon_3 = Paravector(2, -np.pi / 4, epsilon)
+    upsilon_4 = Paravector(pi_over_2, 0, -(np.pi / 4) - epsilon)
+
     chain = Chain([upsilon_1, upsilon_2, upsilon_3, upsilon_4])
     plot_chain(chain)
     return chain
 
+def sin_like_chain2(show = True):
+    upsilon_1 = Paravector(np.pi, 0, 1.5 * np.pi / 6)
+    upsilon_2 = Paravector(np.pi, 0, -1.5 * np.pi / 6)
+
+    chain = Chain([upsilon_1, upsilon_2])
+    plot_chain(chain)
+    return chain
 #endregion
 
 if __name__ == "__main__":
-    simple_paravector()
+    sin_like_chain2()
