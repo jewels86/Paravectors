@@ -187,6 +187,29 @@ def plot_chain(chain: Chain, path: str = None):
 
     plt.show()
 
+def plot_global(*upsilons, path: str = None ):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    for upsilon in upsilons:
+        (pv, placementx, placementy) = upsilon
+        x_values = np.linspace(placementx, placementx + pv.alpha * np.cos(pv.theta), 100)
+        func = pv.as_global_x(placementx, placementy)
+        y_values = [func(x) for x in x_values]
+        ax.plot(x_values, y_values, label=f'({pv.alpha}, {pv.theta}, {pv.beta})')
+
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_title('Paravector Chain Visualization')
+    ax.grid(True)
+    ax.legend()
+
+    ax.set_aspect('equal')
+
+    if path is not None:
+        plt.savefig(path, dpi=300, bbox_inches='tight')
+
+    plt.show()
+
+
 #endregion
 #region Examples
 def paravector_example(span, theta, beta, show = True):
@@ -221,7 +244,13 @@ def sin_like_chain2(show = True):
     chain = Chain([upsilon_1, upsilon_2])
     plot_chain(chain)
     return chain
+
+def happy_face():
+    eye1 = Paravector(2, 0,  np.pi / 4)
+    eye2 = Paravector(2, 0,  np.pi / 4)
+    mouth = Paravector(6, 0, -np.pi / 4)
+    plot_global((eye1, 1, 2), (eye2, 3.5, 2), (mouth, 0, 0))
 #endregion
 
 if __name__ == "__main__":
-    sin_like_chain2()
+    happy_face()
