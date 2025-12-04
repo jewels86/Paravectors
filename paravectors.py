@@ -187,7 +187,7 @@ def plot_chain(chain: Chain, path: str = None):
 
     plt.show()
 
-def plot_global(*upsilons, path: str = None ):
+def plot_global(*upsilons, path: str = None):
     fig, ax = plt.subplots(figsize=(10, 6))
     for upsilon in upsilons:
         (pv, placementx, placementy) = upsilon
