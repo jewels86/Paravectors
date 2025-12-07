@@ -3,71 +3,98 @@
 
 ## The Math
 Paravectors are like polar coordinates with an extra component:
+
 $$
 \upsilon = (\alpha, \theta, \beta)
 $$
+
 $\alpha$ and $\theta$ are the span length and direction of the paravector (like the components of a normal vector), and $\beta$ represents the curvature- specifically, the angle of a line tangent at the first zero.
 
 In the local frame, we can represent the upsilon as it's original parabola with:
+
 $$
 \upsilon(x) = ax \ \cdot \ (x - \alpha) 
 $$
+
 We can find $a$ with:
+
 $$
 f(x) = bx(x - \alpha)
 $$
+
 $$
 f'(x) = \frac{d}{dx} bx(x - \alpha) = 2bx - b\alpha
 $$
+
 $$
 f'(0) = -b\alpha
 $$
+
 So the angle of the line tangent at 0 is:
+
 $$
 \beta = tan^{-1}(-b\alpha)
 $$
+
 Thus, for $\upsilon(x)$:
+
 $$
 a = \frac{tan(-\beta)}{\alpha}
 $$
+
 To find the original coefficient.
 
 ### Function Approximation
 We can chain paravectors:
+
 $$
 (\upsilon_1, \upsilon_2, ... \upsilon_n) = ((\alpha_1, \theta_1, \beta_1), \ (\alpha_2, \theta_2, \beta_2), ... \ (\alpha_n, \theta_n, \beta_n))
 $$
+
 First, to create an $\Upsilon(x)$ we need to define $\upsilon(x)$ in the global frame. We'll use parametric equations:
+
 $$
 x' = h + x\cos\theta - y\sin\theta
 $$
+
 $$
 y' = k + x\sin\theta + y\cos\theta = \Upsilon(x)
 $$
+
 Rearranging and subsituting:
+
 $$
 0 = h + x\cos\theta - (ax(x - \alpha)\sin\theta) - x'
 $$
+
 $$
 0 = h + x\cos\theta - (ax^2\sin\theta - ax\alpha\sin\theta) - x'
 $$
+
 $$
 0 = h + x\cos\theta - ax^2\sin\theta + ax\alpha\sin\theta - x'
 $$
+
 $$
 0 = -ax^2\sin\theta + x\cos\theta + ax\alpha\sin\theta + h - x' 
 $$
+
 $$
 0 = ax^2\sin\theta - x\cos\theta - ax\alpha\sin\theta + x' - h
 $$
+
 We can use the quadratic formula to solve with $A = a\sin\theta$, $B = -(\cos\theta + a\alpha\sin\theta)$, $C = x' - h$ so that:
+
 $$
 x = \frac{-B \pm \sqrt{B^2 - 4AC}}{2A}
 $$
+
 Geometrically, $x$ is the input to $\upsilon(x)$ where it's output lines up with $x'$. Now we can solve for the global $y$:
+
 $$
 y' = k + x\sin\theta + \upsilon_n(x)\cos\theta = \Upsilon_n(x)
 $$
+
 We can chain the $\Upsilon_n$ function with others now in a piecewise.
 
 ## Uses
